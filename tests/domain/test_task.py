@@ -83,3 +83,24 @@ def test_is_due_soon_within_24h(make_task, now):
     assert make_task(due_date=now + timedelta(hours=5)).is_due_soon(now)
     assert not make_task(due_date=now + timedelta(hours=30)).is_due_soon(now)
     assert not make_task(due_date=now - timedelta(hours=1)).is_due_soon(now)
+
+
+def test_with_changes_returns_updated_copy(make_task, now):
+    task = make_task()
+    later = now + timedelta(hours=1)
+
+    changed = task.with_changes(later, title="New title")
+
+    assert changed.title == "New title"
+    assert changed.updated_at == later
+    assert task.title == "Homework"
+
+
+def test_with_changes_rejects_final_states(make_task, now):
+    with pytest.raises(TaskNotModifiableError):
+        make_task(status=TaskStatus.DONE).with_changes(now, title="x")
+
+
+def test_with_changes_revalidates_invariants(make_task, now):
+    with pytest.raises(ValidationError):
+        make_task().with_changes(now, group_members=["u2"])
