@@ -26,3 +26,10 @@ def test_main_exposes_an_app():
     from main import app
 
     assert app.title
+
+
+def test_health_endpoint_reports_ok(anonymous_client):
+    response = anonymous_client.get("/health")
+
+    assert response.status_code == 200
+    assert response.json() == {"status": "ok"}

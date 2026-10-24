@@ -1,0 +1,32 @@
+services:
+  dynamodb:
+    image: amazon/dynamodb-local:latest
+    command: ["-jar", "DynamoDBLocal.jar", "-inMemory", "-sharedDb"]
+    ports:
+      - "8001:8000"
+
+  create-table:
+    build: .
+    depends_on:
+      - dynamodb
+    working_dir: /app
+    volumes:
+      - ./scripts:/app/scripts:ro
+    command: ["python", "scripts/create_table.py"]
+    environment: &env
+      PYTHONPATH: /app
+      TASKS_REPOSITORY: dynamodb
+      TASKS_TABLE_NAME: uniflow-tasks
+      AWS_REGION: us-east-1
+      DYNAMODB_ENDPOINT_URL: http://dynamodb:8000
+      AWS_ACCESS_KEY_ID: local
+      AWS_SECRET_ACCESS_KEY: local
+
+  tasks-service:
+    build: .
+    depends_on:
+      create-table:
+        condition: service_completed_successfully
+    ports:
+      - "8000:8000"
+    environment: *env

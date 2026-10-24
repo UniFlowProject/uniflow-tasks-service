@@ -9,5 +9,10 @@ def create_app(container: Container | None = None) -> FastAPI:
     app = FastAPI(title="Uniflow Tasks Service")
     app.state.container = container or build_default_container()
     app.include_router(tasks_router)
+
+    @app.get("/health")
+    def health() -> dict[str, str]:
+        return {"status": "ok"}
+
     register_error_handlers(app)
     return app
