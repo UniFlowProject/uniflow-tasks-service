@@ -1,7 +1,26 @@
 from datetime import timedelta
 
+import boto3
+import pytest
+from moto import mock_aws
+
 from src.domain.enums import SortOrder, TaskPriority, TaskSortField, TaskStatus
 from src.domain.filters import TaskFilter
+from src.infrastructure.dynamo_table import create_tasks_table
+from src.infrastructure.dynamo_task_repository import DynamoTaskRepository
+from src.infrastructure.in_memory_task_repository import InMemoryTaskRepository
+from tests.application.fakes import FixedClock
+
+
+@pytest.fixture(params=["memory", "dynamodb"])
+def repo(request, now):
+    clock = FixedClock(now)
+    if request.param == "memory":
+        yield InMemoryTaskRepository(clock)
+        return
+    with mock_aws():
+        resource = boto3.resource("dynamodb", region_name="us-east-1")
+        yield DynamoTaskRepository(create_tasks_table(resource, "tasks"), clock)
 
 
 def ids(tasks) -> list[str]:
