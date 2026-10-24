@@ -81,6 +81,14 @@ class Task(BaseModel):
         if self.user_id != user_id:
             raise ForbiddenError(self.id)
 
+    def with_changes(self, now: datetime, **changes) -> "Task":
+        """Return an updated copy, re-running every invariant.
+
+        Status is not changeable here: use transition_to.
+        """
+        self.ensure_modifiable()
+        return Task.model_validate({**self.model_dump(), **changes, "updated_at": now})
+
     def transition_to(self, new_status: TaskStatus, now: datetime) -> None:
         if new_status not in ALLOWED_TRANSITIONS[self.status]:
             raise InvalidStatusTransitionError(self.status, new_status)
