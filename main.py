@@ -1,7 +1,3 @@
-from fastapi import FastAPI
+from src.infrastructure.http.app import create_app
 
-app = FastAPI()
-
-@app.get("/")
-async def root():
-    return {"message": "Hello World"}
+app = create_app()
