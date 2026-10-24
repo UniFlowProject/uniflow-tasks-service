@@ -2,7 +2,7 @@ from src.domain.task import Task
 
 
 class NoopReminderScheduler:
-    """Temporary stand-in until the EventBridge adapter exists."""
+    """Default scheduler when reminders are disabled."""
 
     def schedule(self, task: Task) -> None:
         pass
