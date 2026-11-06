@@ -13,6 +13,11 @@ deployment, so this standalone Python service became redundant.
 - An EventBridge-based reminder scheduler (with a no-op implementation for local runs).
 - A `Dockerfile` and `docker-compose.yml`.
 
+## History
+
+This `main` branch holds the Python/FastAPI rewrite. The original Go implementation
+(MongoDB, `cmd/` and `internal/` layout) is preserved on the `go-old-version` branch.
+
 ## Where to go
 
-Central repository: https://github.com/UniFlowProject/uniflow (link placeholder, update if the location changes).
+Central repository: https://github.com/UniFlowProject/uniflow
